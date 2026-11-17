@@ -25,7 +25,11 @@ dislikes Veo's colour", "Always vertical for TikTok", "Budget: under $1 per clip
 These override the defaults below. The master copy of this file lives in the `Barnzor/video`
 repo (see SKILL.md, step 7).
 
-- (nothing recorded yet)
+- **Sound is low priority** (said Nov 2026). Default videos to silent, which is often cheaper,
+  e.g. Veo 3.1 Lite at 720p is $0.03/s silent vs $0.05/s with audio. Only add sound when the
+  piece needs it or the user asks, and mention the price difference when you offer it.
+- **First test (Nov 2026):** Nano Banana 2 frames → Veo 3.1 Lite image-to-video, vertical. Both
+  shots were kept on the first take; the user was happy with it.
 
 ## Video
 

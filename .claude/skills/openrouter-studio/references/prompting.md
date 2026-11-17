@@ -1,5 +1,57 @@
 # Writing prompts that get the shot
 
+## The standard: no gaps
+
+A model fills every gap you leave with its own guess. That's how unwanted people, random
+lettering, extra objects and odd camera moves appear. So every prompt in a plan must pass this
+checklist before it is shown to the user. There are no exceptions, not even for tests.
+
+| # | Must state | Example |
+|---|---|---|
+| 1 | **Shot and camera:** framing, lens, height, and the move (or "locked-off") | "Wide shot, 35mm, eye level just above the waterline, slow push-in" |
+| 2 | **Subject:** what exactly, with 3 or more concrete details (material, colour, size, condition, clothing, age) | "small wooden sailboat, honey-varnished planks, single cream canvas sail" |
+| 3 | **Count and emptiness:** how many of each thing, and who is **not** there | "one boat, alone; empty, nobody aboard" |
+| 4 | **Action and timing** (video): one main action, its pace, and where it ends | "rocks gently on slow swells; sail ripples; ends still centred" |
+| 5 | **Setting:** place, background, time of day, weather | "open calm sea, distant flat horizon, golden hour, clear air" |
+| 6 | **Light and colour:** direction, quality, palette | "low sun behind camera left, warm rim light on the sail, peach-and-gold sky, turquoise water" |
+| 7 | **Composition:** where the subject sits, what's in the background, and the space needed for text or overlays | "boat centred in the lower half, horizon on the upper third" |
+| 8 | **Style and finish:** medium and texture | "photoreal, natural colours, fine film grain" |
+| 9 | **Text and marks:** the exact words in quotes, or say there are none | "clean, unmarked hull; no text anywhere" |
+| 10 | **Sound** (video with audio on): ambience, effects, music mood, and dialogue with its speaker | "soft lapping water, light wind, no music" |
+| 11 | **Keep fixed** (image to video, and edits): what must not change | "the boat, sail and colours stay exactly as in the start frame" |
+| 12 | **Avoid:** the known failure modes for this shot | see below |
+
+**How to write "avoid":**
+- Prefer **positive wording** in the main prompt ("empty boat", "clean unmarked hull",
+  "single subject"). Some models read "no people" as a hint to add people.
+- When the model has a negative-prompt option, also put the avoid list there. For Kling, use
+  `"options": {"kling.negative_prompt": "..."}` (the slug may need confirming). For Veo, use
+  `"options": {"google-vertex.negativePrompt": "..."}`. For Wan, use `negative_prompt`.
+- Typical avoid lists:
+  - **People shots:** extra fingers, warped hands, face changing, extra people.
+  - **Products:** changed label, garbled text, wrong logo, extra items.
+  - **Scenes:** random text or signage, watermarks, people in the background, cuts, sudden camera shake.
+
+**Length:** images 60 to 150 words; video 50 to 120 words. For **image to video**, items 1, 4, 10
+and 11 matter most, because the picture already settles the look, and restating the look can
+fight the image. When showing the plan, tell the user in one line which checklist points you
+deliberately left to the model, if any.
+
+**Worked example (the sailboat test, done properly):**
+
+*Image:* "Cinematic wide shot, 35mm lens at eye level just above the waterline. One small wooden
+sailboat with honey-varnished planks and a single cream canvas sail floats alone in the centre of
+the lower half of the frame on a calm turquoise sea. The boat is empty with a clean, unmarked hull.
+Gentle ripples, a soft reflection beneath the hull. Open sea to a flat horizon on the upper third,
+peach-and-gold sky at golden hour, low sun behind camera left giving warm rim light on the sail.
+Photoreal, natural colours, fine film grain, light haze on the horizon. No text anywhere."
+
+*Video (from that image):* "Slow, steady push-in toward the boat across the whole clip, camera
+level. The boat rocks gently on slow swells, the sail ripples softly in a light breeze, and
+sunlight glitters on the water. The boat, sail, colours and empty deck stay exactly as in the
+start frame. Smooth, calm motion, one continuous shot." The negative prompt, if the model
+supports one, would be: "people, text, letters, extra boats, cuts, camera shake".
+
 ## Video: write one shot, like a cinematographer
 
 Use this order, in one paragraph of 40 to 120 words:

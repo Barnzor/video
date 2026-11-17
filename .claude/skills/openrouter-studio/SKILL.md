@@ -105,7 +105,12 @@ for each:
 - Choose models with `references/models.md`. Its **House preferences** section wins over the
   defaults. Confirm each model still exists and supports the settings, using `models ... --search`
   (free).
-- Pick a workflow from `references/recipes.md`, and write prompts with `references/prompting.md`.
+- Pick a workflow from `references/recipes.md`.
+- Write every prompt to the **no-gaps standard** in `references/prompting.md`. Every prompt passes
+  its 12-point checklist: camera, subject details, counts and who is absent, action and timing,
+  setting, light, composition, style, text, sound, what stays fixed, and what to avoid. A short
+  prompt lets the model invent things, so this applies even to tests. Put the avoid list into a
+  negative-prompt option when the model has one.
 - **Default shape: frames first, then motion.** Plan an image item for each shot's first frame,
   then a video item that animates it. That gives the user control over the look before paying
   for video.
@@ -119,7 +124,8 @@ Show the user the plan as readable text, item by item:
 - the model, and briefly why you chose it,
 - the settings,
 - the inputs,
-- the **full prompt**,
+- the **full prompt**, plus any negative prompt,
+- one line naming any checklist point deliberately left to the model,
 - the cost.
 
 Then show the script and the total. For a long plan, group the items into **rounds**:

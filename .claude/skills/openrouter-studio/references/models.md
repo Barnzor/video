@@ -28,8 +28,14 @@ repo (see SKILL.md, step 7).
 - **Sound is low priority** (said Nov 2026). Default videos to silent, which is often cheaper,
   e.g. Veo 3.1 Lite at 720p is $0.03/s silent vs $0.05/s with audio. Only add sound when the
   piece needs it or the user asks, and mention the price difference when you offer it.
-- **First test (Nov 2026):** Nano Banana 2 frames → Veo 3.1 Lite image-to-video, vertical. Both
-  shots were kept on the first take; the user was happy with it.
+- **Real work: quality first.** For anything the user will actually use, plan premium models,
+  e.g. Veo 3.1 (full) or Kling 3.0 Pro for video, and Nano Banana Pro or GPT Image 2.6 Sunburst
+  for frames. Name a cheaper option only as an alternative. Cheap models are for tests and
+  quick drafts only.
+- **The first test (Nov 2026)** used Nano Banana 2 frames and Veo 3.1 Lite video. It was kept
+  **only as a cheap proof that the process works**. It says nothing about the user's taste in
+  models; don't treat it as a preference.
+- **Ask at the start of a job** whether it's a test or real use, unless that's obvious.
 
 ## Video
 

@@ -490,7 +490,9 @@ def describe_inputs(it: dict, items: dict, plan_dir: Path) -> list[str]:
             if isinstance(one, str) and one.startswith("@"):
                 ref = items.get(one[1:])
                 t = chosen_take(ref) if ref else None
-                where = f"take {t['take']}: {t['files'][0] if k != 'extend' else t.get('job')}" if t else "NOT MADE YET"
+                made = ref and any(x.get("status") == "done" for x in ref.get("takes", []))
+                where = (f"take {t['take']}: {t['files'][0] if k != 'extend' else t.get('job')}" if t
+                         else "NO KEPT TAKE: all takes rejected" if made else "NOT MADE YET")
                 lines.append(f"{k.replace('_', ' ')}: {one} ({where})")
             else:
                 lines.append(f"{k.replace('_', ' ')}: {one}")

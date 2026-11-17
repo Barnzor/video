@@ -28,11 +28,11 @@ Rough cost for a 5-second, 720p, silent clip unless noted. Sound usually adds 25
 | High resolution (2K or 4K) | `black-forest-labs/flux-3-video` (17 to 41 c/s) | Up to 4K, opening and closing keyframes | `minimax/hailuo-3` (2K, ~$0.65) | `google/veo-3.1` at 4K |
 | Fast and cheap experiments | `x-ai/grok-imagine-video` (5 c/s at 480p) | 1 to 15 s, very cheap | `grok-imagine-video-1.5-lite` (2 c/s at 480p) | `x-ai/grok-imagine-video-1.5` |
 | Text or logos inside the video | `minimax/hailuo-3` | Described as good at text and brand rendering | | |
-| Talking head from one photo (lip-sync) | `heygen/avatar-iv` (5 c/s) | Photo plus script becomes a talking video; voice options via `--option` | | |
+| Talking head from one photo (lip-sync) | `heygen/avatar-iv` (5 c/s) | Photo plus script becomes a talking video; voice options via the item's `options` | | |
 | Short clip with built-in dialogue and SFX | `heygen/heygen-video-1` | Synthesised audio in one call | | |
 | Edit an existing video (swap object, restyle, change setting) | `black-forest-labs/flux-video-edit` (3 c/s) | Instruction-based edits | | `runway/aleph-2` (28 c/s, minimum 56 c) |
 | Upscale a video | `black-forest-labs/flux-video-upscale` | 1.5 to 3 times larger, same length | | |
-| Extend or continue a clip | A model that accepts `--extend JOB_ID` (Seedance 2.5, FLUX.3 Video) | Continues the same shot | | |
+| Extend or continue a clip | A model that accepts the `extend` input (Seedance 2.5, FLUX.3 Video) | Continues the same shot | | |
 
 Notes:
 - **Veo** accepts only 4, 6 or 8 seconds and only 16:9 or 9:16.
@@ -42,7 +42,7 @@ Notes:
 - **Image to video** is usually the best way to get a specific look. Make the frame with an image
   model first, then animate it.
 - **Provider options** (negative prompt, guidance and so on) need the provider's slug, for example
-  `--option google-vertex.negativePrompt="blurry"` for Veo. Other slugs (Kling, Seedance's `seed`
+  `"options": {"google-vertex.negativePrompt": "blurry"}` for Veo. Other slugs (Kling, Seedance's `seed`
   or `byteplus`) aren't listed by the API. Try one, and if the option is ignored, put the
   guidance in the prompt instead.
 
@@ -52,7 +52,7 @@ Notes:
 |---|---|---|---|
 | General use, edits, combining several pictures | `google/gemini-3.1-flash-image` (Nano Banana 2) | ~$0.07 | Up to 14 reference images; 512 to 4K |
 | Best quality, complex scenes, text, real-world accuracy | `google/gemini-3-pro-image` (Nano Banana Pro) | ~$0.13 to $0.25 | |
-| Precise edits, dense layouts and text, consistent multi-step edits | `openai/gpt-image-2.6-sunburst` | ~$0.03 to $0.15 by quality | Up to 16 references; `--quality low/medium/high` |
+| Precise edits, dense layouts and text, consistent multi-step edits | `openai/gpt-image-2.6-sunburst` | ~$0.03 to $0.15 by quality | Up to 16 references; setting `quality`: low, medium or high |
 | Fast iterations | `openai/gpt-image-2.6-flare` or `google/gemini-3.1-flash-lite-image` | ~$0.02 to $0.04 | |
 | Photoreal products and lifestyle shots | `bytedance-seed/seedream-5-5` | $0.02 to $0.035 | Up to 10 references |
 | Cheapest decent drafts | `black-forest-labs/flux.2-klein-4b` | ~$0.015 per megapixel | Up to 4 references |

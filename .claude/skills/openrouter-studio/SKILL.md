@@ -18,10 +18,11 @@ want**, not just to send a request. That means:
 The user is not technical. Talk plainly and keep each reply short. Never show them raw JSON or
 command lines unless they ask.
 
-Everything goes through one script, which uses the standard library only:
+Everything goes through one script, which uses the standard library only. `${CLAUDE_SKILL_DIR}` is
+this skill's own folder. If it isn't filled in, use the folder this SKILL.md was loaded from.
 
 ```
-python3 .claude/skills/openrouter-studio/scripts/studio.py <command> ...
+python3 ${CLAUDE_SKILL_DIR}/scripts/studio.py <command> ...
 ```
 
 The key comes from `OPENROUTER_API_KEY`. If it is missing, ask the user to save it as a secret in
@@ -42,7 +43,10 @@ Video options: `--duration`, `--resolution`, `--aspect 16:9|9:16|1:1...`, `--aud
 `--first-frame FILE|URL`, `--last-frame FILE|URL`, `--ref IMG` (repeatable), `--ref-video`,
 `--ref-audio`, `--extend JOB_ID`, `--seed`, `--option slug.key=value`, `--name`, `--no-wait`.
 Image options: `--aspect`, `--resolution 1K|2K|4K`, `--n`, `--quality`, `--format`, `--ref IMG` (repeatable), `--name`.
-`--out-dir DIR` goes **before** the command. Files land in `./outputs/`, along with a `history.jsonl` log.
+`--out-dir DIR` goes **before** the command. Files land in `./outputs/` in the current folder, along
+with a `history.jsonl` log. Inside a git repo, the script adds `outputs/` to that repo's local
+ignore list (`.git/info/exclude`). That keeps generated media out of commits without changing any
+of the repo's files.
 
 ## The workflow
 
@@ -127,9 +131,17 @@ model, a reference image, or the seed. Keep the rest fixed, so you learn what fi
 
 ### 7. Learn their taste
 
-When the user says what they like or dislike, add a short line under **House preferences** in
-`references/models.md`. Examples: a model they prefer, a look they like, their usual format or
-their budget. Tell them you've noted it. Those preferences win over the defaults next time.
+Read **House preferences** in `references/models.md` before choosing a model. Those preferences
+win over the defaults.
+
+When the user says what they like or dislike (a model, a look, their usual format, their budget),
+note it. This skill is installed from the user's claude.ai account, and edits to an installed copy
+don't last. So:
+- If the session has the `Barnzor/video` repo, add the line under **House preferences** in that
+  repo's `.claude/skills/openrouter-studio/references/models.md`, then commit and push it. The
+  next re-upload will then carry it.
+- Otherwise, tell the user plainly: "I've noted that for this chat. To make it permanent, it needs
+  adding to the skill's master copy in your Barnzor/video repo, and then the skill re-uploaded."
 
 ## Rules
 
@@ -143,4 +155,4 @@ their budget. Tell them you've noted it. Those preferences win over the defaults
   and don't make sexual content of real people, deceptive impersonation or anything illegal.
   Model safety filters may also refuse things; if one does, explain it plainly and suggest a
   rewording.
-- Keep the user's files in `outputs/`. It is git-ignored, so don't commit generated media.
+- Keep the user's files in `outputs/`. Never commit generated media to the user's repos.

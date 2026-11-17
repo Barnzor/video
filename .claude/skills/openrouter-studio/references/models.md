@@ -9,7 +9,8 @@ what the user actually prefers under **House preferences** at the bottom.
 
 Update this section as you learn what this user likes, e.g. "Prefers Kling for people,
 dislikes Veo's colour", "Always vertical for TikTok", "Budget: under $1 per clip unless told".
-These override the defaults below. Commit the change so it sticks.
+These override the defaults below. The master copy of this file lives in the `Barnzor/video`
+repo (see SKILL.md, step 7).
 
 - (nothing recorded yet)
 

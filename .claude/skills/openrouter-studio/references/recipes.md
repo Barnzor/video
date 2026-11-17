@@ -1,7 +1,7 @@
 # Recipes
 
 Multi-step workflows for the results people usually want from tools like Higgsfield. In all of
-them, `S` is `python3 .claude/skills/openrouter-studio/scripts/studio.py`. Show the plan and the
+them, `S` is `python3 ${CLAUDE_SKILL_DIR}/scripts/studio.py`. Show the plan and the
 total cost before you start, and show each intermediate image so the user can redirect early.
 
 ## Animate a photo (the most controllable way to get a specific look)

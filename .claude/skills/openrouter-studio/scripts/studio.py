@@ -87,8 +87,28 @@ def slug(text: str, n: int = 40) -> str:
     return (s[:n].rstrip("-")) or "untitled"
 
 
+def keep_out_of_git(out_dir: Path) -> None:
+    """If out_dir is inside a git repo, list it in that repo's local .git/info/exclude (never committed)."""
+    here = out_dir.resolve().parent
+    for d in (here, *here.parents):
+        git = d / ".git"
+        if git.is_dir():
+            try:
+                rel = out_dir.resolve().relative_to(d).as_posix()
+                exclude = git / "info" / "exclude"
+                lines = exclude.read_text().splitlines() if exclude.exists() else []
+                if f"/{rel}/" not in lines:
+                    exclude.parent.mkdir(parents=True, exist_ok=True)
+                    with open(exclude, "a") as f:
+                        f.write(f"\n# media from openrouter-studio\n/{rel}/\n")
+            except (OSError, ValueError):
+                pass
+            return
+
+
 def out_path(out_dir: Path, prompt: str, ext: str, name: str | None, index: int | None = None) -> Path:
     out_dir.mkdir(parents=True, exist_ok=True)
+    keep_out_of_git(out_dir)
     base = name or f"{dt.datetime.now().strftime('%Y%m%d-%H%M%S')}-{slug(prompt)}"
     if index is not None:
         base = f"{base}-{index + 1}"

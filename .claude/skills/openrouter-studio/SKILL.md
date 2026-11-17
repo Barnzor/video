@@ -104,8 +104,9 @@ what it cost afterwards.
   (`run_in_background`), so you can talk with the user while it renders. You will be told when it
   finishes. If it prints "Still ... Resume with: studio.py wait JOB_ID", run that.
 - Several videos at once: start each with `--no-wait`, then run `wait` on each job.
-- Paths can be local files: the script turns them into data URLs. If a video model rejects a
-  local image, it may need a public URL. Say so, and ask the user for a link to the image.
+- Paths can be local files: the script turns them into data URLs. This was tested and works for
+  a video's first frame with Grok Imagine. If another video model rejects a local image, it may
+  need a public URL. Say so, and ask the user for a link to the image.
 
 ### 6. Deliver and improve
 

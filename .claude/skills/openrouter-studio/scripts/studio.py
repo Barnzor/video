@@ -215,7 +215,7 @@ def estimate_image(model_id: str, settings: dict, n_refs: int) -> tuple[float | 
     mp = {"512": 0.25, "768": 0.6, "1K": 1, "1.5K": 2.25, "2K": 4, "4K": 16}.get(res, 1)
     q = settings.get("quality") or "medium"
     out_tokens = {"low": 272, "medium": 1056, "high": 4160, "auto": 1056}.get(q, 1056) if model_id.startswith("openai/") \
-        else (2000 if res == "4K" else 1120)
+        else {"4K": 2500, "2K": 1600}.get(res, 1120)  # Nano Banana 2 at 2K billed ~1,515 tokens (Nov 2026 take)
     lo = hi = 0.0
     for p in endpoints[0].get("pricing") or []:
         cost, unit, what = float(p["cost_usd"]), p["unit"], p["billable"]

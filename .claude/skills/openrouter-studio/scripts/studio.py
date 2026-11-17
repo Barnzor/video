@@ -12,6 +12,7 @@ Free:
   studio.py plan show PLAN.json [--items a,b]         the whole plan in plain words, with costs
   studio.py plan approve PLAN.json --items a,b        record the user's yes for these items as they stand
   studio.py plan pick PLAN.json ITEM TAKE             choose which take later items build on
+  studio.py plan verdict PLAN.json ITEM TAKE keep|reject --reason "..."   log the judgement
   studio.py history [--last 10]
 
 Costs money (refuses anything not approved exactly as it stands now):
@@ -380,6 +381,19 @@ PLAN_TEMPLATE = {
 
 SPEC_KEYS = ("type", "model", "prompt", "settings", "inputs", "options")
 
+# Known prompt-length limits in characters (from vendor or reseller docs; Nov 2026). Prefix match on model id.
+PROMPT_CAPS = {
+    "runway/": 1000, "kwaivgi/kling": 2500, "minimax/hailuo-2": 2000, "minimax/hailuo-3": 7000,
+    "alibaba/wan-2.6": 1500, "alibaba/wan-2.7": 5000, "black-forest-labs/flux-video-edit": 4096,
+}
+
+
+def prompt_cap(model_id: str) -> int | None:
+    for prefix, cap in PROMPT_CAPS.items():
+        if model_id.startswith(prefix):
+            return cap
+    return None
+
 
 def load_plan(path: Path) -> dict:
     try:
@@ -427,7 +441,8 @@ def chosen_take(it: dict) -> dict | None:
         for t in done:
             if t["take"] == it["pick"]:
                 return t
-    return done[-1] if done else None
+    usable = [t for t in done if t.get("verdict") != "reject"]
+    return usable[-1] if usable else None
 
 
 def resolve(value, items: dict, plan_dir: Path, need: bool):
@@ -537,12 +552,21 @@ def cmd_plan_show(a):
             print(f"  Input:    {line}")
         if it.get("options"):
             print(f"  Options:  {it['options']}")
-        print(f"  Prompt:   {it.get('prompt') or '(none)'}")
+        prompt = it.get("prompt") or ""
+        words = len(prompt.split())
+        cap = prompt_cap(it["model"])
+        print(f"  Prompt:   {prompt or '(none)'}")
+        print(f"            ({words} words, {len(prompt)} characters" + (f"; limit about {cap}" if cap else "") + ")")
+        if cap and len(prompt) > cap:
+            print("            TOO LONG for this model: shorten before approval.")
         print(f"  Cost:     {fmt_range(lo, hi)}")
         if it["takes"]:
             done = [t for t in it["takes"] if t.get("status") == "done"]
             pick = chosen_take(it)
             print(f"  Takes:    {len(done)} made" + (f", using take {pick['take']} ({pick['files'][0]})" if pick else ""))
+            for t in it["takes"]:
+                if t.get("verdict"):
+                    print(f"            take {t['take']}: {t['verdict']}" + (f": {t['reason']}" if t.get("reason") else ""))
             running = [t for t in it["takes"] if t.get("status") == "running"]
             if running:
                 print(f"            {len(running)} still rendering: run 'plan wait'")
@@ -568,6 +592,22 @@ def cmd_plan_approve(a):
         items[iid]["approved"] = fingerprint(items[iid])
         print(f"Approved {iid} exactly as it stands now.")
     save_plan(a.plan, plan)
+
+
+def cmd_plan_verdict(a):
+    plan = load_plan(a.plan)
+    it = next((x for x in plan["items"] if x["id"] == a.item), None)
+    take = next((t for t in (it or {}).get("takes", []) if t["take"] == a.take), None)
+    if not take:
+        raise StudioError(f"{a.item} has no take {a.take}.")
+    take["verdict"] = a.verdict
+    take["reason"] = a.reason or ""
+    if a.verdict == "keep" and take.get("status") == "done":
+        it["pick"] = a.take
+    elif a.verdict == "reject" and it.get("pick") == a.take:
+        it["pick"] = None
+    save_plan(a.plan, plan)
+    print(f"{a.item} take {a.take}: {a.verdict}" + (f" ({a.reason})" if a.reason else ""))
 
 
 def cmd_plan_pick(a):
@@ -611,6 +651,9 @@ def precheck(it: dict, items: dict, plan_dir: Path, earlier: set[str]) -> None:
         find_model("image", it["model"])
     if not it.get("prompt") and it["type"] == "image":
         raise StudioError(f"{it['id']}: images need a prompt.")
+    cap = prompt_cap(it["model"])
+    if cap and len(it.get("prompt") or "") > cap:
+        raise StudioError(f"{it['id']}: prompt is {len(it['prompt'])} characters; {it['model']} allows about {cap}. Nothing was sent.")
     for v in (it.get("inputs") or {}).values():
         for one in v if isinstance(v, list) else [v]:
             if not isinstance(one, str) or not one:
@@ -815,6 +858,13 @@ def main():
     s.add_argument("plan", type=Path)
     s.add_argument("--items", required=True)
     s.set_defaults(fn=cmd_plan_approve)
+    s = pl.add_parser("verdict", help="record keep/reject and why, for learning")
+    s.add_argument("plan", type=Path)
+    s.add_argument("item")
+    s.add_argument("take", type=int)
+    s.add_argument("verdict", choices=["keep", "reject"])
+    s.add_argument("--reason")
+    s.set_defaults(fn=cmd_plan_verdict)
     s = pl.add_parser("pick")
     s.add_argument("plan", type=Path)
     s.add_argument("item")

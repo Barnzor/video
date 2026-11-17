@@ -1,9 +1,22 @@
 # Which model for which job
 
 Prices are from OpenRouter's live list in November 2026 and change. Check with `quote` (video) or
-`models image --long` before quoting the user. The picks below come from each model's own
-description and price, not from side-by-side testing. Treat them as starting points, and record
-what the user actually prefers under **House preferences** at the bottom.
+`models image --long` before quoting the user.
+
+The picks combine each model's description and price with the November 2026 research report.
+"Which model wins" claims in that report rest on single tests and affiliate blogs, so treat
+them as starting points. The user's own keep/reject verdicts, recorded as **House preferences**,
+outrank everything here. How to word prompts for each model is in `model-notes.md`.
+
+**Routing that sources broadly agree on:**
+- **Veo 3.1:** dialogue and lip-sync, prompt discipline and polish.
+- **Kling 3.0:** realistic motion, animating stills, first-to-last-frame fidelity (best in one test).
+- **Seedance:** longest clips, most reference images, multi-shot, cheap B-roll.
+- **Runway Aleph or FLUX Video Edit:** surgical edits to existing footage.
+- **HeyGen Avatar IV:** a talking head from one photo.
+- **Grok Imagine Lite:** cheap simple clips.
+- **Stills for video:** Nano Banana (Google's documented keyframe partner for Veo) or GPT Image
+  for characters, products and text.
 
 ## House preferences
 
@@ -41,24 +54,27 @@ Notes:
 - **Seedance** is priced per "video token", so the estimate is approximate. Trust the "Actual cost" line.
 - **Image to video** is usually the best way to get a specific look. Make the frame with an image
   model first, then animate it.
-- **Provider options** (negative prompt, guidance and so on) need the provider's slug, for example
-  `"options": {"google-vertex.negativePrompt": "blurry"}` for Veo. Other slugs (Kling, Seedance's `seed`
-  or `byteplus`) aren't listed by the API. Try one, and if the option is ignored, put the
-  guidance in the prompt instead.
+- **Provider options** (negative prompt, rewriter off and so on) need the provider's slug, e.g.
+  `"options": {"google-vertex.negativePrompt": "subtitles, text"}` for Veo. Most slugs are
+  unconfirmed, and OpenRouter's own Veo page may not pass these through. Never let a plan depend
+  on an option working; wording in the prompt comes first. See `model-notes.md`.
+- **Veo dialogue** comes out with burned-in subtitles on a share of takes. Plan for a crop or a
+  reroll when there's speech.
 
 ## Images
 
 | Job | First choice | Approx. cost | Notes |
 |---|---|---|---|
 | General use, edits, combining several pictures | `google/gemini-3.1-flash-image` (Nano Banana 2) | ~$0.07 | Up to 14 reference images; 512 to 4K |
-| Best quality, complex scenes, text, real-world accuracy | `google/gemini-3-pro-image` (Nano Banana Pro) | ~$0.13 to $0.25 | |
+| Best quality, complex scenes, dense text, character-sheet grids | `google/gemini-3-pro-image` (Nano Banana Pro) | ~$0.13 to $0.25 | Leans toward realism; state any stylised look first |
+| Newest Google default, everyday stills | `google/gemini-nano-banana-2.1` | check `models image --long` | Successor to Nano Banana 2 |
 | Precise edits, dense layouts and text, consistent multi-step edits | `openai/gpt-image-2.6-sunburst` | ~$0.03 to $0.15 by quality | Up to 16 references; setting `quality`: low, medium or high |
 | Fast iterations | `openai/gpt-image-2.6-flare` or `google/gemini-3.1-flash-lite-image` | ~$0.02 to $0.04 | |
 | Photoreal products and lifestyle shots | `bytedance-seed/seedream-5-5` | $0.02 to $0.035 | Up to 10 references |
 | Cheapest decent drafts | `black-forest-labs/flux.2-klein-4b` | ~$0.015 per megapixel | Up to 4 references |
 | Top artistic quality | `black-forest-labs/flux-3-image` | $0.04 to $0.10 (4K ~$0.60) | Up to 10 references |
 | Logos, icons, illustration, SVG | `recraft/recraft-v4.1-vector` | $0.08 | Outputs SVG |
-| Text-accurate posters and graphics | `qwen/qwen-image-3` | $0.03 | Small text down to 10 px |
+| Text-accurate posters and graphics, especially Chinese text | `qwen/qwen-image-3` | $0.03 | Small text down to 10 px; output takes the **last** reference image's aspect ratio |
 | Edit one photo with instructions | `krea/k3-edit` | $0.03 to $0.06 | Needs 1 to 8 input images |
 | 360° panorama | `tencent/hy-world-2.1-panorama` | | |
 

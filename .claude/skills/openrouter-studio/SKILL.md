@@ -36,6 +36,7 @@ python3 ${CLAUDE_SKILL_DIR}/scripts/studio.py <command> ...
 | `plan run PLAN --items a,b --max-usd X` | makes exactly those approved items, in that order, refusing if the estimate is over X. Each run adds a new numbered **take** | **yes** |
 | `plan wait PLAN` | collect videos that were still rendering | no |
 | `plan pick PLAN ITEM TAKE` | choose which take later items build on (default: the newest good take) | no |
+| `plan verdict PLAN ITEM TAKE keep\|reject --reason "..."` | record the user's judgement and why; "keep" also picks it | no |
 | `history [--all]` | what was made, files and real cost | no |
 
 The key comes from `OPENROUTER_API_KEY`. If it is missing, ask the user to save it as a secret in
@@ -80,8 +81,9 @@ Start from `plan template`. The format is:
   "the chosen take of that item". This is how frames feed videos and character sheets feed shots.
 - **`options`** holds provider options, as `{"google-vertex.negativePrompt": "blurry"}`.
 - **Prompts are the exact text sent.** Nothing is added behind the user's back. Any spoken line
-  must appear both in `script` and, in quotes, in the relevant prompt.
-- The script adds `approved`, `takes` and `pick` itself. Don't hand-edit those.
+  must appear both in `script` and in the relevant prompt, word for word, written in that model's
+  dialogue format (e.g. after a colon for Veo; see `model-notes.md`).
+- The script adds `approved`, `takes`, `pick` and verdicts itself. Don't hand-edit those.
 
 ## The workflow
 
@@ -106,11 +108,25 @@ for each:
   defaults. Confirm each model still exists and supports the settings, using `models ... --search`
   (free).
 - Pick a workflow from `references/recipes.md`.
-- Write every prompt to the **no-gaps standard** in `references/prompting.md`. Every prompt passes
-  its 12-point checklist: camera, subject details, counts and who is absent, action and timing,
-  setting, light, composition, style, text, sound, what stays fixed, and what to avoid. A short
-  prompt lets the model invent things, so this applies even to tests. Put the avoid list into a
-  negative-prompt option when the model has one.
+- Write every prompt with **`references/prompting.md`** (the research-backed rules) and
+  **`references/model-notes.md`** (each model's syntax, limits and quirks). Read the notes for
+  every model in the plan. The essentials:
+  - **Text to video** follows the five-part brief: shot and camera, specific subject, one action,
+    setting, light and style. Always end with an audio block. About 40–120 words.
+  - **Image to video** describes motion only: one camera move with its speed and end framing,
+    plus what stays still and audio. About 15–40 words. Never re-describe the picture.
+  - **Say what you don't want the right way for that model.** Video models, FLUX and Runway
+    need positive wording ("empty deck", not "no people"). GPT Image and Nano Banana can also
+    take one short "Do not…". Bare nouns go only in real negative-prompt fields.
+  - **Characters:** use a fixed character block pasted word for word, and re-anchor to the
+    original reference. Every prompt stands alone.
+  - **References:** give each one a role, in that model's format.
+  - **Model syntax:** dialogue punctuation, multi-shot labels, camera brackets and prompt limits
+    all vary by model. `plan show` flags prompts that are too long.
+  - **Rewriters:** some models rewrite prompts automatically (Wan, Hailuo, Qwen, Veo). When the
+    prompt is precise, plan to switch the rewriter off via `options` where OpenRouter lists one,
+    and tell the user it's unverified.
+- A short prompt lets the model invent things, so even tests get full prompts.
 - **Default shape: frames first, then motion.** Plan an image item for each shot's first frame,
   then a video item that animates it. That gives the user control over the look before paying
   for video.
@@ -157,9 +173,24 @@ Run `plan run PLAN --items <same ids> --max-usd <the total they agreed, rounded 
   text, the subject drifting, timing.
 - For each item, ask the user to **keep it** or say **what to change**.
 - **Keep** a take: run `plan pick` if it isn't the newest. Later items then use it.
+- **Log every judgement:** run `plan verdict PLAN ITEM TAKE keep|reject --reason "..."`. A "keep"
+  also picks that take. These records are the user's own evidence for which models and prompts work.
 - **Change** an item: edit only that item, changing one or two things (prompt wording, model,
   reference, seed). Then show the before and after of what changed, plus its cost, and get a yes
   again. Old takes are kept, so the user can always go back.
+- **Diagnose before rerolling.** Work through these in order:
+  1. Is the prompt overloaded or contradictory? Simplify it.
+  2. Is the input still flawed? Fix the still.
+  3. Is there too much motion? Slow it, lock the camera, split the shot, or add an end frame.
+  4. Does identity drift? Strengthen the references and paste the character block word for word.
+  5. Only then is it bad luck: reroll 2 or 3 times.
+
+  Negative-prompt terms come last.
+- **Retake budget.** Expect 2 to 4 takes per simple shot. Ambitious ads run 20 or more per
+  usable clip. Tell the user this up front, and include it in round costs. After about 4
+  failed rerolls of a shot, stop and diagnose. After about 10, redesign the shot instead of
+  spending more. On Veo, seeds change little, so explore by changing the wording.
+- **Prefer editing the still to rerolling video.** It's cheaper and more controllable.
 - Move to the next round only when the current one is agreed.
 
 ### 6. Learn their taste

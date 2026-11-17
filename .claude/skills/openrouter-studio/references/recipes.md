@@ -46,8 +46,11 @@ planning the next, so the user can redirect early.
   to speak**, the same words as in the plan's `script`. Voice and style choices (`voice_id`,
   `expressiveness`, `background`, `caption`) are provider options. If they're needed, try
   `"options": {"heygen.voice_id": "..."}`.
-- For a whole scene with dialogue (not a single talking face), use Veo 3.1 with `"audio": true`
-  and the line in quotes in the prompt.
+- For a whole scene with dialogue (not a single talking face), use Veo 3.1 with `"audio": true`.
+  Write the line after a colon, not in quotes: `The man in the grey suit says: …`. Keep it to
+  about 15–20 words per 8 s, and add "(no subtitles)". See model-notes.
+- Creators often avoid on-camera speech altogether, because it's where the "AI look" shows most.
+  They put the words in a voice-over instead, made separately.
 - Only use a real person's face with their permission.
 
 ## Short story or ad sequence (several clips)
